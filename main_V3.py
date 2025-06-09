@@ -121,7 +121,7 @@ def get_driver():
     options.add_argument("--no-sandbox")  # Recommandé sur les serveurs
     options.add_argument("--disable-dev-shm-usage")  # Évite certains crashes
     options.add_argument("--disable-gpu")  # Optionnel
-    return webdriver.Chrome(options=options)
+    return webdriver.Chrome(executable_path="/usr/bin/chromedriver", options=options)
 
 
 
