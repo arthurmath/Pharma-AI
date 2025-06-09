@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 llm = init_chat_model("openai:gpt-4.1-mini", temperature=0) 
+# llm = init_chat_model("openai:gpt-4o", temperature=0) 
 
 def call_llm(messages: list):
     response = llm.invoke(messages)
@@ -32,7 +33,7 @@ st.subheader("💬 Conversation")
 for msg in st.session_state.messages:
     if msg["role"] != "system":
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            st.write(msg["content"])
 
 
 
@@ -42,17 +43,14 @@ user_input = st.chat_input("Posez votre question ici...")
 
 if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
-
     with st.chat_message("user"):
-        st.markdown(user_input)
+        st.write(user_input)
 
+    with st.spinner("Le LLM réfléchit..."):
+        response = call_llm(st.session_state.messages)
+        
+    st.session_state.messages.append({"role": "assistant", "content": response})
     with st.chat_message("assistant"):
-        with st.spinner("Le LLM réfléchit..."):
-            response = call_llm(st.session_state.messages)
-            st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
-
-
-
+        st.write(response)
 
 # streamlit run front_V0.py

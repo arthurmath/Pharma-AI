@@ -72,34 +72,39 @@ user_input = st.chat_input("Posez votre question ici...")
 
 # Traitement du message
 if user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
     
+    st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
 
+
+    with st.spinner("Le LLM réfléchit..."):
+        reponse = call_llm(st.session_state.messages, llm)
+    
+    
+    st.session_state.messages.append({"role": "assistant", "content": reponse})
     with st.chat_message("assistant"):
-        with st.spinner("Le LLM réfléchit..."):
-            reponse = call_llm(st.session_state.messages, llm)
-            st.markdown(reponse)
-            booleen, list_medics = extraction_llm(reponse, llm)
-            
-            if booleen:
-                print("\n\n######## CALL AGENT ######## \n\n")
-            
-                confirmation, liens = call_agent(st.session_state.messages, list_medics)
-                st.markdown(f"\n\nVérification : \n\n" + confirmation)
+        st.markdown(reponse)
+        
+        booleen, list_medics = extraction_llm(reponse, llm)
+        
+        if booleen:
+            print("\n\n######## CALL AGENT ######## \n\n")
+        
+            confirmation, liens = call_agent(st.session_state.messages, list_medics)
+            st.markdown(f"\n\nVérification : \n\n" + confirmation)
 
-                # Génère les petits numéros de référence cliquables
-                ref_links = ""
-                for i, link in enumerate(liens):
-                    ref_links += f"-{list_medics[i].capitalize()} : [({i+1})]({link}) \n"
+            # Génère les petits numéros de référence cliquables
+            ref_links = ""
+            for i, link in enumerate(liens):
+                ref_links += f"-{list_medics[i].capitalize()} : [({i+1})]({link}) \n"
 
-                # Affiche la réponse enrichie avec les références
-                st.markdown("\n\nSources : \n" + ref_links, unsafe_allow_html=True)
+            # Affiche la réponse enrichie avec les références
+            st.markdown("\n\nSources : \n" + ref_links, unsafe_allow_html=True)
 
-            st.session_state.messages.append({"role": "assistant", "content": reponse})
-
+    
 
 
 
-# streamlit run front_V2.py
+
+# streamlit run front_V3.py
